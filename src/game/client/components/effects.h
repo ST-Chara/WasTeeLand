@@ -24,6 +24,7 @@ public:
 	void PlayerDeath(vec2 Pos, int ClientID);
 	void Explosion(vec2 Pos);
 	void HammerHit(vec2 Pos);
+	void Sparks(vec2 Pos, vec2 Size);
 
 	virtual void OnRender();
 };

@@ -212,7 +212,16 @@ void CInfoMessages::RenderKillMsg(CInfoMsg *pInfoMsg, float x, float y) const
 	float FontSize = 36.0f;
 	float KillerNameW = pInfoMsg->m_Player2NameCursor.Width() + UI()->GetClientIDRectWidth(FontSize);
 	float VictimNameW = pInfoMsg->m_Player1NameCursor.Width() + UI()->GetClientIDRectWidth(FontSize);
+	int ImageToBeUse = IMAGE_GAME;
+	switch (pInfoMsg->m_Weapon)
+	{
+	case WEAPON_SWORD:
+		ImageToBeUse = IMAGE_SWORD;
+		break;
 
+	default:
+		break;
+	}
 	// render victim name
 	x -= VictimNameW;
 	float AdvanceID = UI()->DrawClientID(pInfoMsg->m_Player1NameCursor.m_FontSize, vec2(x, y), pInfoMsg->m_Player1ID);
@@ -227,7 +236,7 @@ void CInfoMessages::RenderKillMsg(CInfoMsg *pInfoMsg, float x, float y) const
 		if(pInfoMsg->m_ModeSpecial&1)
 		{
 			Graphics()->BlendNormal();
-			Graphics()->TextureSet(g_pData->m_aImages[IMAGE_GAME].m_Id);
+			Graphics()->TextureSet(g_pData->m_aImages[ImageToBeUse].m_Id);
 			Graphics()->QuadsBegin();
 
 			if(pInfoMsg->m_Player1ID == pInfoMsg->m_FlagCarrierBlue)
@@ -249,7 +258,7 @@ void CInfoMessages::RenderKillMsg(CInfoMsg *pInfoMsg, float x, float y) const
 	x -= 44.0f;
 	if(pInfoMsg->m_Weapon >= 0)
 	{
-		Graphics()->TextureSet(g_pData->m_aImages[IMAGE_GAME].m_Id);
+		Graphics()->TextureSet(g_pData->m_aImages[ImageToBeUse].m_Id);
 		Graphics()->QuadsBegin();
 		RenderTools()->SelectSprite(g_pData->m_Weapons.m_aId[pInfoMsg->m_Weapon].m_pSpriteBody);
 		RenderTools()->DrawSprite(x, y+28, 96);
@@ -264,7 +273,8 @@ void CInfoMessages::RenderKillMsg(CInfoMsg *pInfoMsg, float x, float y) const
 			if(pInfoMsg->m_ModeSpecial&2)
 			{
 				Graphics()->BlendNormal();
-				Graphics()->TextureSet(g_pData->m_aImages[IMAGE_GAME].m_Id);
+				Graphics()->TextureSet(g_pData->m_aImages[ImageToBeUse].m_Id);
+
 				Graphics()->QuadsBegin();
 
 				if(pInfoMsg->m_Player2ID == pInfoMsg->m_FlagCarrierBlue)

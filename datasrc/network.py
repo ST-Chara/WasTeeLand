@@ -183,6 +183,7 @@ Objects = [
 		NetEnum("m_Emote", Emotes),
 		NetTick("m_AttackTick"),
 		NetFlag("m_TriggeredEvents", CoreEventFlags),
+        NetIntAny("m_Mana"),
 	]),
 
 	NetObject("PlayerInfo", [
@@ -255,6 +256,10 @@ Objects = [
 		NetIntRange("m_HealthAmount", 0, 9),
 		NetIntRange("m_ArmorAmount", 0, 9),
 		NetBool("m_Self"),
+	]),
+    
+	NetEvent("Sparks:Common", [
+        NetIntAny("m_Size"),
 	]),
 
 	## Race

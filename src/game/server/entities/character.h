@@ -54,6 +54,7 @@ public:
 
 	bool IncreaseHealth(int Amount);
 	bool IncreaseArmor(int Amount);
+	bool IncreaseMana(int Amount);
 
 	bool GiveWeapon(int Weapon, int Ammo);
 	void GiveNinja();
@@ -106,6 +107,8 @@ private:
 
 	int m_Health;
 	int m_Armor;
+	int m_Mana;
+	int m_CurrentMana;
 
 	int m_TriggeredEvents;
 

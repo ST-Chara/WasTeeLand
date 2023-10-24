@@ -68,6 +68,7 @@ class Animation(Struct):
 		self.back_foot = AnimSequence()
 		self.front_foot = AnimSequence()
 		self.attach = AnimSequence()
+		self.rush = AnimSequence()
 
 class WeaponSpec(Struct):
 	def __init__(self, container=None, name=""):
@@ -89,6 +90,8 @@ class WeaponSpec(Struct):
 		self.muzzleoffsetx = Float(0)
 		self.muzzleoffsety = Float(0)
 		self.muzzleduration = Float(5)
+
+		self.mana_needed = Int(0)
 
 		# dig out sprites if we have a container
 		if container:
@@ -146,6 +149,16 @@ class Weapon_Ninja(Struct):
 		self.movetime = Int(200)
 		self.velocity = Int(50)
 
+class Weapon_Sword(Struct):
+	def __init__(self):
+		Struct.__init__(self, "CDataWeaponspecSword")
+		self.base = Pointer(WeaponSpec, WeaponSpec())
+
+class Weapon_Spark(Struct):
+	def __init__(self):
+		Struct.__init__(self, "CDataWeaponspecSpark")
+		self.base = Pointer(WeaponSpec, WeaponSpec())
+
 class Weapons(Struct):
 	def __init__(self):
 		Struct.__init__(self, "CDataWeaponspecs")
@@ -155,6 +168,8 @@ class Weapons(Struct):
 		self.grenade = Weapon_Grenade()
 		self.laser = Weapon_Laser()
 		self.ninja = Weapon_Ninja()
+		self.sword = Weapon_Sword()
+		self.spark = Weapon_Spark()
 		self.id = Array(WeaponSpec())
 
 class Explosion(Struct):
@@ -162,6 +177,11 @@ class Explosion(Struct):
 		Struct.__init__(self, "CDataExplosion")
 		self.radius = Float(135)
 		self.max_force = Float(12)
+
+class Mana(Struct):
+	def __init__(self):
+		Struct.__init__(self, "CDataMana")
+		self.max = Int(500)
 
 class DataContainer(Struct):
 	def __init__(self):
@@ -174,6 +194,7 @@ class DataContainer(Struct):
 		self.animations = Array(Animation())
 		self.weapons = Weapons()
 		self.explosion = Explosion()
+		self.mana = Mana()
 
 def FileList(format, num):
 	return [format%(x+1) for x in range(0,num)]
@@ -251,6 +272,10 @@ image_sidebaricons = Image("sidebaricons", "ui/icons/sidebar.png", 1)
 image_chatwhisper = Image("chatwhisper", "ui/icons/chat_whisper.png", 1)
 image_timerclock = Image("timerclock", "ui/icons/timer_clock.png", 1)
 
+image_sword = Image("sword", "sword.png")
+image_spark = Image("spark", "sparks.png")
+image_spark_w = Image("spark_w", "sparks.png")
+
 container.images.Add(image_null)
 container.images.Add(image_game)
 container.images.Add(Image("deadtee", "deadtee.png"))
@@ -278,6 +303,9 @@ container.images.Add(image_sidebaricons)
 container.images.Add(image_chatwhisper)
 container.images.Add(Image("raceflag", "race_flag.png"))
 container.images.Add(image_timerclock)
+container.images.Add(image_sword)
+container.images.Add(image_spark)
+container.images.Add(image_spark_w)
 
 container.pickups.Add(Pickup("health"))
 container.pickups.Add(Pickup("armor"))
@@ -314,6 +342,9 @@ set_networkicons = SpriteSet("networkicons", image_networkicons, 1, 2)
 set_levelicons = SpriteSet("levelicons", image_levelicons, 4, 4)
 set_sidebaricons = SpriteSet("sidebaricons", image_sidebaricons, 4, 2)
 set_timerclock = SpriteSet("timerclock", image_timerclock, 1, 2)
+set_sword = SpriteSet("sword", image_sword, 32, 8)
+set_spark = SpriteSet("spark", image_spark, 4, 2)
+set_spark_w = SpriteSet("spark_w", image_spark_w, 30, 4)
 
 container.spritesets.Add(set_particles)
 container.spritesets.Add(set_game)
@@ -341,6 +372,9 @@ container.spritesets.Add(set_levelicons)
 container.spritesets.Add(set_sidebaricons)
 container.spritesets.Add(set_timerclock)
 container.spritesets.Add(set_browsericon)
+container.spritesets.Add(set_sword)
+container.spritesets.Add(set_spark)
+container.spritesets.Add(set_spark_w)
 
 
 container.sprites.Add(Sprite("part_slice", set_particles, 0,0,1,1))
@@ -568,6 +602,29 @@ container.sprites.Add(Sprite("browser_b", set_browsericon, 0,1,1,1))
 container.sprites.Add(Sprite("timerclock_a", set_timerclock, 0,0,1,1))
 container.sprites.Add(Sprite("timerclock_b", set_timerclock, 0,1,1,1))
 
+container.sprites.Add(Sprite("weapon_sword_body", set_sword, 0, 0, 7, 2))
+container.sprites.Add(Sprite("weapon_sword_cursor", set_sword, 9, 0, 2, 2))
+container.sprites.Add(Sprite("weapon_sword_proj", set_sword, 22, 4, 2, 2))
+container.sprites.Add(Sprite("weapon_sword_muzzle1", set_sword, 16, 0, 7, 2))
+container.sprites.Add(Sprite("weapon_sword_muzzle2", set_sword, 24, 0, 7, 2))
+
+container.sprites.Add(Sprite("weapon_spark_body", set_spark_w, 0, 0, 0, 0))
+container.sprites.Add(Sprite("weapon_spark_cursor", set_spark_w, 0, 2, 7, 2))
+container.sprites.Add(Sprite("weapon_spark_proj", set_spark_w, 0, 0, 0, 0))
+container.sprites.Add(Sprite("weapon_spark_muzzle1", set_spark_w, 0, 0, 7, 2))
+container.sprites.Add(Sprite("weapon_spark_muzzle2", set_spark_w, 8, 0, 7, 2))
+container.sprites.Add(Sprite("weapon_spark_muzzle3", set_spark_w, 16, 0, 7, 2))
+container.sprites.Add(Sprite("weapon_spark_muzzle4", set_spark_w, 0, 2, 7, 2))
+container.sprites.Add(Sprite("weapon_spark_muzzle5", set_spark_w, 8, 2, 7, 2))
+container.sprites.Add(Sprite("weapon_spark_muzzle6", set_spark_w, 16, 2, 7, 2))
+
+
+for i in range(1, 4):
+	container.sprites.Add(Sprite("spark1_"+str(i), set_spark, i-1, 0, 1, 1))
+
+for i in range(1, 4):
+	container.sprites.Add(Sprite("spark2_"+str(i), set_spark, i-1, 1, 1, 1))
+
 anim = Animation("base")
 anim.body.frames.Add(AnimKeyframe(0, 0, -4, 0))
 anim.back_foot.frames.Add(AnimKeyframe(0, 0, 10, 0))
@@ -613,6 +670,42 @@ anim.attach.frames.Add(AnimKeyframe(0.3, 0, 0, 0.25))
 anim.attach.frames.Add(AnimKeyframe(0.4, 0, 0, 0.30))
 anim.attach.frames.Add(AnimKeyframe(0.5, 0, 0, 0.25))
 anim.attach.frames.Add(AnimKeyframe(1.0, 0, 0, -0.10))
+container.animations.Add(anim)
+
+anim = Animation("sword_rush")
+anim.attach.frames.Add(AnimKeyframe(0.01, 0, 0, -0.02))
+anim.attach.frames.Add(AnimKeyframe(0.05, 20, 0, -0.01))
+anim.attach.frames.Add(AnimKeyframe(0.1, 40, 0, -0.02))
+anim.attach.frames.Add(AnimKeyframe(0.15, 60, 0, -0.05))
+anim.attach.frames.Add(AnimKeyframe(0.2, 80, 0, -0.02))
+anim.attach.frames.Add(AnimKeyframe(0.25, 100, 0, -0.01))
+anim.attach.frames.Add(AnimKeyframe(0.3, 120, 0, -0.04))
+anim.attach.frames.Add(AnimKeyframe(0.35, 140, 0, -0.02))
+anim.attach.frames.Add(AnimKeyframe(0.4, 160, 0, -0.01))
+anim.attach.frames.Add(AnimKeyframe(0.45, 180, 0, -0.02))
+anim.attach.frames.Add(AnimKeyframe(0.5, 200, 0, -0.04))
+anim.attach.frames.Add(AnimKeyframe(0.55, 180, 0, -0.1))
+anim.attach.frames.Add(AnimKeyframe(0.6, 160, 0, -0.02))
+anim.attach.frames.Add(AnimKeyframe(0.65, 140, 0, -0.03))
+anim.attach.frames.Add(AnimKeyframe(0.7, 120, 0, -0.01))
+anim.attach.frames.Add(AnimKeyframe(0.75, 100, 0, -0.05))
+anim.attach.frames.Add(AnimKeyframe(0.8, 80, 0, -0.02))
+anim.attach.frames.Add(AnimKeyframe(0.85, 60, 0, -0.03))
+anim.attach.frames.Add(AnimKeyframe(0.9, 40, 0, -0.01))
+anim.attach.frames.Add(AnimKeyframe(0.95, 20, 0, -0.03))
+anim.attach.frames.Add(AnimKeyframe(1.0, 0, 0, -0.01))
+anim.attach.frames.Add(AnimKeyframe(1.0, 25, 0, -0.02))
+container.animations.Add(anim)
+
+anim = Animation("spark_fire")
+anim.attach.frames.Add(AnimKeyframe(0.01, 0, 0, -0.2))
+anim.attach.frames.Add(AnimKeyframe(0.05, 10, 30, -0.19))
+anim.attach.frames.Add(AnimKeyframe(0.1, 20, 20, -0.15))
+anim.attach.frames.Add(AnimKeyframe(0.15, 30, 10, -0.1))
+anim.attach.frames.Add(AnimKeyframe(0.2, 35, 15, -0.07))
+anim.attach.frames.Add(AnimKeyframe(0.25, 45, 10, -0.07))
+anim.attach.frames.Add(AnimKeyframe(0.3, 60, 5, -0.07))
+anim.attach.frames.Add(AnimKeyframe(0.35, 70, 2, -0.07))
 container.animations.Add(anim)
 
 anim = Animation("ninja_swing")
@@ -683,4 +776,23 @@ weapon.offsety.Set(0)
 weapon.muzzleoffsetx.Set(40)
 weapon.muzzleoffsety.Set(-4)
 container.weapons.ninja.base.Set(weapon)
+container.weapons.id.Add(weapon)
+
+weapon = WeaponSpec(container, "sword")
+weapon.firedelay.Set(50)
+weapon.damage.Set(6)
+weapon.visual_size.Set(114)
+weapon.offsetx.Set(-54)
+weapon.offsety.Set(-2)
+container.weapons.sword.base.Set(weapon)
+container.weapons.id.Add(weapon)
+
+weapon = WeaponSpec(container, "spark")
+weapon.firedelay.Set(20)
+weapon.damage.Set(10)
+weapon.visual_size.Set(114)
+weapon.offsetx.Set(16)
+weapon.offsety.Set(-2)
+weapon.mana_needed.Set(25)
+container.weapons.spark.base.Set(weapon)
 container.weapons.id.Add(weapon)

@@ -141,6 +141,7 @@ public:
 	void CreatePlayerSpawn(vec2 Pos);
 	void CreateDeath(vec2 Pos, int Who);
 	void CreateSound(vec2 Pos, int Sound, int64 Mask=-1);
+	void CreateSparks(vec2 Pos, int Size, int Owner = -1, int Weapon = WEAPON_SPARK, int MaxDamage = 0, bool SelfDamage = false);
 
 	// network
 	void SendChat(int ChatterClientID, int Mode, int To, const char *pText);

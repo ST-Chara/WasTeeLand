@@ -46,6 +46,8 @@ struct CParticle
 	float m_Life;
 	int m_PrevPart;
 	int m_NextPart;
+
+	int m_Image = IMAGE_PARTICLES;
 };
 
 class CParticles : public CComponent
@@ -57,6 +59,7 @@ public:
 		GROUP_PROJECTILE_TRAIL=0,
 		GROUP_EXPLOSIONS,
 		GROUP_GENERAL,
+		GROUP_SPARKS,
 		NUM_GROUPS
 	};
 
@@ -78,7 +81,7 @@ private:
 	int m_FirstFree;
 	int m_aFirstPart[NUM_GROUPS];
 
-	void RenderGroup(int Group);
+	void RenderGroup(int Group, int Image);
 	void Update(float TimePassed);
 
 	template<int TGROUP>
@@ -86,11 +89,12 @@ private:
 	{
 	public:
 		CParticles *m_pParts;
-		virtual void OnRender() { m_pParts->RenderGroup(TGROUP); }
+		virtual void OnRender() { m_pParts->RenderGroup(TGROUP, m_pParts->m_aParticles->m_Image); }
 	};
 
 	CRenderGroup<GROUP_PROJECTILE_TRAIL> m_RenderTrail;
 	CRenderGroup<GROUP_EXPLOSIONS> m_RenderExplosions;
 	CRenderGroup<GROUP_GENERAL> m_RenderGeneral;
+	CRenderGroup<GROUP_SPARKS> m_RenderSparks;
 };
 #endif

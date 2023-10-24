@@ -37,6 +37,8 @@ class CHud : public CComponent
 	void RenderRaceTime(const CNetObj_PlayerInfoRace *pRaceInfo);
 	void RenderCheckpoint();
 	void RenderLocalTime(float x);
+	void RenderManaBar(float x, float y, float Progress);
+
 public:
 	CHud();
 

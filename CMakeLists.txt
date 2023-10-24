@@ -982,6 +982,8 @@ set(EXPECTED_DATA
   maps/readme.txt
   particles.png
   race_flag.png
+  sword.png
+  sparks.png
   skins/beaver.json
   skins/bluekitty.json
   skins/bluestripe.json

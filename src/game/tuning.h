@@ -44,4 +44,10 @@ MACRO_TUNING_PARAM(LaserBounceCost, laser_bounce_cost, 0)
 
 MACRO_TUNING_PARAM(PlayerCollision, player_collision, 1)
 MACRO_TUNING_PARAM(PlayerHooking, player_hooking, 1)
+
+// Sparks
+MACRO_TUNING_PARAM(SparkCurvature, spark_curvature, 0.f)
+MACRO_TUNING_PARAM(SparkSpeed, spark_speed, 2200.0f)
+MACRO_TUNING_PARAM(SparkLifetime, spark_lifetime, 4.0f)
+
 #endif
