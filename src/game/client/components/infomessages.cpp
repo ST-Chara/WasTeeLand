@@ -218,8 +218,17 @@ void CInfoMessages::RenderKillMsg(CInfoMsg *pInfoMsg, float x, float y) const
 	case WEAPON_SWORD:
 		ImageToBeUse = IMAGE_SWORD;
 		break;
+	
+	case WEAPON_SPARK:
+		ImageToBeUse = IMAGE_SPARK;
+		break;
+
+	case WEAPON_SCYTHE:
+		ImageToBeUse = IMAGE_SCYTHE;
+		break;
 
 	default:
+		ImageToBeUse = IMAGE_GAME;
 		break;
 	}
 	// render victim name

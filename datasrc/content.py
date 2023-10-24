@@ -159,6 +159,11 @@ class Weapon_Spark(Struct):
 		Struct.__init__(self, "CDataWeaponspecSpark")
 		self.base = Pointer(WeaponSpec, WeaponSpec())
 
+class Weapon_Scythe(Struct):
+	def __init__(self):
+		Struct.__init__(self, "CDataWeaponspecScythe")
+		self.base = Pointer(WeaponSpec, WeaponSpec())
+
 class Weapons(Struct):
 	def __init__(self):
 		Struct.__init__(self, "CDataWeaponspecs")
@@ -170,6 +175,7 @@ class Weapons(Struct):
 		self.ninja = Weapon_Ninja()
 		self.sword = Weapon_Sword()
 		self.spark = Weapon_Spark()
+		self.scythe = Weapon_Scythe()
 		self.id = Array(WeaponSpec())
 
 class Explosion(Struct):
@@ -275,6 +281,7 @@ image_timerclock = Image("timerclock", "ui/icons/timer_clock.png", 1)
 image_sword = Image("sword", "sword.png")
 image_spark = Image("spark", "sparks.png")
 image_spark_w = Image("spark_w", "sparks.png")
+image_scythe = Image("scythe", "scythe.png")
 
 container.images.Add(image_null)
 container.images.Add(image_game)
@@ -306,6 +313,7 @@ container.images.Add(image_timerclock)
 container.images.Add(image_sword)
 container.images.Add(image_spark)
 container.images.Add(image_spark_w)
+container.images.Add(image_scythe)
 
 container.pickups.Add(Pickup("health"))
 container.pickups.Add(Pickup("armor"))
@@ -345,6 +353,7 @@ set_timerclock = SpriteSet("timerclock", image_timerclock, 1, 2)
 set_sword = SpriteSet("sword", image_sword, 32, 8)
 set_spark = SpriteSet("spark", image_spark, 4, 2)
 set_spark_w = SpriteSet("spark_w", image_spark_w, 30, 4)
+set_scythe = SpriteSet("scythe", image_scythe, 4, 1)
 
 container.spritesets.Add(set_particles)
 container.spritesets.Add(set_game)
@@ -375,6 +384,7 @@ container.spritesets.Add(set_browsericon)
 container.spritesets.Add(set_sword)
 container.spritesets.Add(set_spark)
 container.spritesets.Add(set_spark_w)
+container.spritesets.Add(set_scythe)
 
 
 container.sprites.Add(Sprite("part_slice", set_particles, 0,0,1,1))
@@ -618,6 +628,12 @@ container.sprites.Add(Sprite("weapon_spark_muzzle4", set_spark_w, 0, 2, 7, 2))
 container.sprites.Add(Sprite("weapon_spark_muzzle5", set_spark_w, 8, 2, 7, 2))
 container.sprites.Add(Sprite("weapon_spark_muzzle6", set_spark_w, 16, 2, 7, 2))
 
+container.sprites.Add(Sprite("weapon_scythe_body", set_scythe, 0, 0, 1, 1))
+container.sprites.Add(Sprite("weapon_scythe_cursor", set_game, 0, 0, 2, 2))
+container.sprites.Add(Sprite("weapon_scythe_proj", set_game, 0, 0, 0, 0))
+
+for i in range(1, 5):
+	container.sprites.Add(Sprite("weapon_scythe_muzzle"+str(i), set_scythe, i-1, 0, 1, 1))
 
 for i in range(1, 4):
 	container.sprites.Add(Sprite("spark1_"+str(i), set_spark, i-1, 0, 1, 1))
@@ -795,4 +811,13 @@ weapon.offsetx.Set(16)
 weapon.offsety.Set(-2)
 weapon.mana_needed.Set(25)
 container.weapons.spark.base.Set(weapon)
+container.weapons.id.Add(weapon)
+
+weapon = WeaponSpec(container, "scythe")
+weapon.firedelay.Set(25)
+weapon.damage.Set(1)
+weapon.visual_size.Set(126)
+weapon.offsetx.Set(16)
+weapon.offsety.Set(-20)
+container.weapons.scythe.base.Set(weapon)
 container.weapons.id.Add(weapon)

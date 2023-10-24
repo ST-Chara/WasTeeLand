@@ -62,6 +62,7 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 	m_ActiveWeapon = WEAPON_GUN;
 	m_LastWeapon = WEAPON_HAMMER;
 	m_QueuedWeapon = -1;
+	m_MeleeSpinTick = 0.0f;
 
 	m_pPlayer = pPlayer;
 	m_Pos = Pos;
@@ -252,7 +253,7 @@ void CCharacter::FireWeapon()
 	vec2 Direction = normalize(vec2(m_LatestInput.m_TargetX, m_LatestInput.m_TargetY));
 
 	bool FullAuto = false;
-	if (m_ActiveWeapon == WEAPON_GRENADE || m_ActiveWeapon == WEAPON_SHOTGUN || m_ActiveWeapon == WEAPON_LASER)
+	if (m_ActiveWeapon == WEAPON_GRENADE || m_ActiveWeapon == WEAPON_SHOTGUN || m_ActiveWeapon == WEAPON_LASER || m_ActiveWeapon == WEAPON_SCYTHE)
 		FullAuto = true;
 
 	// check if we gonna fire
@@ -373,7 +374,7 @@ void CCharacter::FireWeapon()
 
 		if (Hits >= 2)
 		{
-			GameServer()->CreateSound(GetPos(), SOUND_HAMMER_FIRE);
+			GameServer()->CreateSound(GetPos(), SOUND_HOOK_NOATTACH);
 		}
 	}
 	break;
@@ -388,6 +389,36 @@ void CCharacter::FireWeapon()
 						g_pData->m_Weapons.m_Spark.m_pBase->m_Damage, false, 0, -1, WEAPON_SPARK, true);
 
 		GameServer()->CreateSound(m_Pos, SOUND_HOOK_LOOP);
+	}
+	break;
+
+	case WEAPON_SCYTHE:
+	{
+		GameServer()->CreateSound(m_Pos, SOUND_HAMMER_FIRE);
+
+		CCharacter *apEnts[MAX_CLIENTS];
+		int Hits = 0;
+		int Num = GameWorld()->FindEntities(ProjStartPos, GetProximityRadius() * 1.3f, (CEntity **)apEnts,
+											MAX_CLIENTS, CGameWorld::ENTTYPE_CHARACTER);
+
+		for (int i = 0; i < Num; ++i)
+		{
+			CCharacter *pTarget = apEnts[i];
+
+			if ((pTarget == this) || GameServer()->Collision()->IntersectLine(ProjStartPos, pTarget->m_Pos, NULL, NULL))
+				continue;
+
+			if (m_CurrentMana >= 10)
+			{
+				if (length(pTarget->m_Pos - ProjStartPos) > 0.0f)
+					GameServer()->CreateSparks(pTarget->m_Pos - normalize(pTarget->m_Pos - ProjStartPos) * GetProximityRadius() * 0.5f, 50, GetPlayer()->GetCID(), WEAPON_SCYTHE, 1);
+				else
+					GameServer()->CreateSparks(ProjStartPos, 50, GetPlayer()->GetCID(), WEAPON_SCYTHE, 6);
+				m_CurrentMana -= 10;
+			}
+			pTarget->TakeDamage(vec2(0.f, 0.f), vec2(0.f, 0.f), g_pData->m_Weapons.m_Scythe.m_pBase->m_Damage,
+								m_pPlayer->GetCID(), m_ActiveWeapon);
+		}
 	}
 	break;
 
@@ -911,6 +942,15 @@ void CCharacter::Snap(int SnappingClient)
 		SetEmote(EMOTE_NORMAL, -1);
 	}
 
+	if (m_MeleeSpinTick < 360.f)
+	{
+		m_MeleeSpinTick += 0.25;
+		if (m_LatestInput.m_Fire & 1)
+			m_MeleeSpinTick += 0.75;
+	}
+	else
+		m_MeleeSpinTick = 0;
+
 	pCharacter->m_Emote = m_EmoteType;
 
 	pCharacter->m_AmmoCount = 0;
@@ -923,6 +963,8 @@ void CCharacter::Snap(int SnappingClient)
 	pCharacter->m_AttackTick = m_AttackTick;
 
 	pCharacter->m_Direction = m_Input.m_Direction;
+
+	pCharacter->m_MeleeSpinTick = int(m_MeleeSpinTick * 100);
 
 	if (m_pPlayer->GetCID() == SnappingClient || SnappingClient == -1 ||
 		(!Config()->m_SvStrictSpectateMode && m_pPlayer->GetCID() == GameServer()->m_apPlayers[SnappingClient]->GetSpectatorID()))

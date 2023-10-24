@@ -1099,4 +1099,16 @@ void CHud::RenderManaBar(float x, float y, float Progress)
 	RenderTools()->SelectSprite(&g_pData->m_aSprites[SPRITE_NINJA_BAR_EMPTY_RIGHT]);
 	Graphics()->SetColor(255.f, 0.f, 0.f, 255.f);
 	Graphics()->QuadsDrawTL(&QuadEndEmpty, 1);
+
+	Graphics()->QuadsEnd();
+	CUIRect Rect;
+	Rect.x = x + 12.f;
+	Rect.y = y;
+	UI()->DoLabel(&Rect, Localize("<-Mana Bar"), 12.f);
+
+	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_GAME].m_Id);
+	Graphics()->WrapClamp();
+
+	Graphics()->QuadsBegin();
+	Graphics()->SetColor(1.0f, 1.0f, 1.0f, 1.0f);
 }

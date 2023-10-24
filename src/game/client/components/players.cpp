@@ -198,12 +198,26 @@ void CPlayers::RenderPlayer(
 	// draw gun
 	if (Player.m_Weapon >= 0)
 	{
-		if (Player.m_Weapon == WEAPON_SWORD)
-			Graphics()->TextureSet(g_pData->m_aImages[IMAGE_SWORD].m_Id);
-		else if (Player.m_Weapon == WEAPON_SPARK)
-			Graphics()->TextureSet(g_pData->m_aImages[IMAGE_SPARK].m_Id);
-		else
-			Graphics()->TextureSet(g_pData->m_aImages[IMAGE_GAME].m_Id);
+		int ImageToBeUse = IMAGE_GAME;
+		switch (Player.m_Weapon)
+		{
+		case WEAPON_SWORD:
+			ImageToBeUse = IMAGE_SWORD;
+			break;
+
+		case WEAPON_SPARK:
+			ImageToBeUse = IMAGE_SPARK;
+			break;
+
+		case WEAPON_SCYTHE:
+			ImageToBeUse = IMAGE_SCYTHE;
+			break;
+
+		default:
+			ImageToBeUse = IMAGE_GAME;
+			break;
+		}
+		Graphics()->TextureSet(g_pData->m_aImages[ImageToBeUse].m_Id);
 
 		Graphics()->QuadsBegin();
 		Graphics()->QuadsSetRotation(State.GetAttach()->m_Angle * pi * 2 + Angle);
@@ -213,8 +227,9 @@ void CPlayers::RenderPlayer(
 		RenderTools()->SelectSprite(g_pData->m_Weapons.m_aId[Weapon].m_pSpriteBody, Direction.x < 0 ? SPRITE_FLAG_FLIP_Y : 0);
 
 		vec2 p;
-		if (Player.m_Weapon == WEAPON_NINJA)
+		switch (Player.m_Weapon)
 		{
+		case WEAPON_NINJA:
 			p = Position;
 			p.y += g_pData->m_Weapons.m_aId[Weapon].m_Offsety;
 
@@ -248,8 +263,9 @@ void CPlayers::RenderPlayer(
 					RenderTools()->DrawSprite(p.x, p.y, 160.0f);
 				}
 			}
-		}
-		else if (Player.m_Weapon == WEAPON_HAMMER)
+			break;
+
+		case WEAPON_HAMMER:
 		{
 			// Static position for hammer
 			p = Position + vec2(State.GetAttach()->m_X, State.GetAttach()->m_Y);
@@ -266,7 +282,9 @@ void CPlayers::RenderPlayer(
 			}
 			RenderTools()->DrawSprite(p.x, p.y, g_pData->m_Weapons.m_aId[Weapon].m_VisualSize);
 		}
-		else if (Player.m_Weapon == WEAPON_SWORD)
+		break;
+
+		case WEAPON_SWORD:
 		{
 			const float RecoilTick = (Client()->GameTick() - Player.m_AttackTick + s_LastIntraTick) / 5.0f;
 			const float Recoil = RecoilTick < 1.0f ? sinf(RecoilTick * pi) : 0.0f;
@@ -295,7 +313,9 @@ void CPlayers::RenderPlayer(
 				Graphics()->QuadsBegin();
 			}
 		}
-		else if (Player.m_Weapon == WEAPON_SPARK)
+		break;
+
+		case WEAPON_SPARK:
 		{
 			const float RecoilTick = (Client()->GameTick() - Player.m_AttackTick + s_LastIntraTick) / 5.0f;
 			const float Recoil = RecoilTick < 1.0f ? sinf(RecoilTick * pi) : 0.0f;
@@ -307,13 +327,41 @@ void CPlayers::RenderPlayer(
 			else
 				p.x -= 10.4f;
 
-			Graphics()->SetColor(255.f, 0.f, 0.f, 140);
 			Graphics()->QuadsSetRotation((Client()->GameTick() - Player.m_AttackTick) * 1.f);
 			RenderTools()->DrawSprite(p.x, p.y, g_pData->m_Weapons.m_aId[Weapon].m_VisualSize);
 			RenderTools()->SelectSprite((rand() % (SPRITE_SPARK2_3 - SPRITE_SPARK1_1)) + SPRITE_SPARK1_1, 0);
 			RenderTools()->DrawSprite(p.x, p.y, 60.0f);
 		}
-		else
+		break;
+
+		case WEAPON_SCYTHE:
+		{
+			if (m_pClient->m_aClients[ClientID].m_Predicted.m_Input.m_Fire & 1)
+			{
+				const float RecoilTick = (350 + s_LastIntraTick) / 5.0f;
+				const float Recoil = RecoilTick < 1.0f ? sinf(RecoilTick * pi) : 0.0f;
+				p = Position + Direction * (g_pData->m_Weapons.m_aId[Weapon].m_Offsetx - Recoil * 100.0f);
+				p.y += g_pData->m_Weapons.m_aId[Weapon].m_Offsety;
+
+				RenderTools()->SelectSprite(SPRITE_WEAPON_SCYTHE_MUZZLE4, 0);
+			}
+			else
+			{
+				p = Position + vec2(State.GetAttach()->m_X, State.GetAttach()->m_Y);
+				p.y += g_pData->m_Weapons.m_aId[Weapon].m_Offsety;
+			}
+			// if attack is under way, bash stuffs
+			if (Direction.x < 0)
+				p.x -= 4.4f;
+			else
+				p.x += 4.4f;
+
+			Graphics()->QuadsSetRotation(Player.m_MeleeSpinTick / 100.f);
+			RenderTools()->DrawSprite(p.x, p.y, g_pData->m_Weapons.m_aId[Weapon].m_VisualSize + 24.f);
+		}
+		break;
+
+		default:
 		{
 			// TODO: should be an animation
 			const float RecoilTick = (Client()->GameTick() - Player.m_AttackTick + s_LastIntraTick) / 5.0f;
@@ -323,28 +371,30 @@ void CPlayers::RenderPlayer(
 			if ((Client()->GameTick() - Player.m_AttackTick) < g_pData->m_Weapons.m_aId[Weapon].m_Firedelay / 50)
 				Graphics()->QuadsSetRotation((Client()->GameTick() % 360 * 8) / 8);
 			RenderTools()->DrawSprite(p.x, p.y, g_pData->m_Weapons.m_aId[Weapon].m_VisualSize);
-		}
 
-		if (Player.m_Weapon == WEAPON_GUN || Player.m_Weapon == WEAPON_SHOTGUN)
-		{
-			// check if we're firing stuff
-			if (g_pData->m_Weapons.m_aId[Weapon].m_NumSpriteMuzzles)
+			if (Player.m_Weapon == WEAPON_GUN || Player.m_Weapon == WEAPON_SHOTGUN)
 			{
-				const float MuzzleTick = Client()->GameTick() - Player.m_AttackTick + s_LastIntraTick;
-				const int IteX = random_int() % g_pData->m_Weapons.m_aId[Weapon].m_NumSpriteMuzzles;
-				static int s_LastIteX = IteX;
-				if (UpdateSingleAnimationFrame)
-					s_LastIteX = IteX;
-
-				if (MuzzleTick < g_pData->m_Weapons.m_aId[Weapon].m_Muzzleduration && g_pData->m_Weapons.m_aId[Weapon].m_aSpriteMuzzles[s_LastIteX])
+				// check if we're firing stuff
+				if (g_pData->m_Weapons.m_aId[Weapon].m_NumSpriteMuzzles)
 				{
-					const bool FlipY = Direction.x < 0.0f;
-					const float OffsetY = g_pData->m_Weapons.m_aId[Weapon].m_Muzzleoffsety * (FlipY ? 1 : -1);
-					const vec2 MuzzlePos = p + Direction * g_pData->m_Weapons.m_aId[Weapon].m_Muzzleoffsetx + vec2(-Direction.y, Direction.x) * OffsetY;
-					RenderTools()->SelectSprite(g_pData->m_Weapons.m_aId[Weapon].m_aSpriteMuzzles[s_LastIteX], FlipY ? SPRITE_FLAG_FLIP_Y : 0);
-					RenderTools()->DrawSprite(MuzzlePos.x, MuzzlePos.y, g_pData->m_Weapons.m_aId[Weapon].m_VisualSize);
+					const float MuzzleTick = Client()->GameTick() - Player.m_AttackTick + s_LastIntraTick;
+					const int IteX = random_int() % g_pData->m_Weapons.m_aId[Weapon].m_NumSpriteMuzzles;
+					static int s_LastIteX = IteX;
+					if (UpdateSingleAnimationFrame)
+						s_LastIteX = IteX;
+
+					if (MuzzleTick < g_pData->m_Weapons.m_aId[Weapon].m_Muzzleduration && g_pData->m_Weapons.m_aId[Weapon].m_aSpriteMuzzles[s_LastIteX])
+					{
+						const bool FlipY = Direction.x < 0.0f;
+						const float OffsetY = g_pData->m_Weapons.m_aId[Weapon].m_Muzzleoffsety * (FlipY ? 1 : -1);
+						const vec2 MuzzlePos = p + Direction * g_pData->m_Weapons.m_aId[Weapon].m_Muzzleoffsetx + vec2(-Direction.y, Direction.x) * OffsetY;
+						RenderTools()->SelectSprite(g_pData->m_Weapons.m_aId[Weapon].m_aSpriteMuzzles[s_LastIteX], FlipY ? SPRITE_FLAG_FLIP_Y : 0);
+						RenderTools()->DrawSprite(MuzzlePos.x, MuzzlePos.y, g_pData->m_Weapons.m_aId[Weapon].m_VisualSize);
+					}
 				}
 			}
+		}
+		break;
 		}
 		Graphics()->QuadsEnd();
 
@@ -359,6 +409,7 @@ void CPlayers::RenderPlayer(
 			RenderTools()->RenderTeeHand(&RenderInfo, p, Direction, -pi / 2, vec2(-5, 4));
 			break;
 		case WEAPON_GRENADE:
+		case WEAPON_SCYTHE:
 			RenderTools()->RenderTeeHand(&RenderInfo, p, Direction, -pi / 2, vec2(-4, 7));
 			break;
 		}

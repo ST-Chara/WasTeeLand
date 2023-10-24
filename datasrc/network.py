@@ -184,6 +184,7 @@ Objects = [
 		NetTick("m_AttackTick"),
 		NetFlag("m_TriggeredEvents", CoreEventFlags),
         NetIntAny("m_Mana"),
+        NetIntAny("m_MeleeSpinTick"), ## m_MeleeSpinTick / 100.f
 	]),
 
 	NetObject("PlayerInfo", [
