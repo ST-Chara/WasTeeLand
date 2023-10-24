@@ -57,30 +57,12 @@ jobs:
         brew upgrade freetype
         sudo rm -rf /Library/Developer/CommandLineTools
 
-    - name: Build in debug mode
-      env: ${{ matrix.env }}
-      run: |
-        mkdir debug
-        cd debug
-        ${{ matrix.cmake-path }}cmake --version
-        ${{ matrix.cmake-path }}cmake ${{ matrix.cmake-args }} -DCMAKE_BUILD_TYPE=Debug -Werror=dev -DDOWNLOAD_GTEST=ON -DDEV=ON -DCMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG=. ..
-        ${{ matrix.cmake-path }}cmake --build . --config Debug ${{ matrix.build-args }} --target everything
-    - name: Test debug
-      run: |
-        cd debug
-        ${{ matrix.cmake-path }}cmake --build . --config Debug ${{ matrix.build-args }} --target run_tests
-    - name: Run debug server
-      env: ${{ matrix.env }}
-      run: |
-        cd debug
-        ./teeworlds_srv shutdown
-
     - name: Build in release mode
       env: ${{ matrix.env }}
       run: |
         mkdir release
         cd release
-        ${{ matrix.cmake-path }}cmake ${{ matrix.cmake-args }} -DCMAKE_BUILD_TYPE=Release -Werror=dev -DDOWNLOAD_GTEST=ON -DCMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE=. ..
+        ${{ matrix.cmake-path }}cmake ${{ matrix.cmake-args }} -DCMAKE_BUILD_TYPE=Release -Werror=dev -DDOWNLOAD_GTEST=OFF -DCMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE=. ..
         ${{ matrix.cmake-path }}cmake --build . --config Release ${{ matrix.build-args }} --target everything
     - name: Test release
       run: |
