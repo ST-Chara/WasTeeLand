@@ -14,13 +14,8 @@
 
 #include "entities/character.h"
 #include "entities/projectile.h"
-#include "gamemodes/ctf.h"
-#include "gamemodes/dm.h"
-#include "gamemodes/lms.h"
-#include "gamemodes/lts.h"
-#include "gamemodes/mod.h"
-#include "gamemodes/tdm.h"
 #include "gamecontext.h"
+#include "gamecontroller.h"
 #include "player.h"
 
 enum
@@ -899,7 +894,7 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 				pPlayer->m_LastVoteTryTick = Now;
 			}
 
-			m_VoteType = VOTE_UNKNOWN;
+			m_VoteType = 0;
 			char aDesc[VOTE_DESC_LENGTH] = {0};
 			char aCmd[VOTE_CMD_LENGTH] = {0};
 			const char *pReason = pMsg->m_Reason[0] ? pMsg->m_Reason : "No reason given";
@@ -1000,7 +995,7 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 				m_VoteClientID = SpectateID;
 			}
 
-			if (m_VoteType != VOTE_UNKNOWN)
+			if (m_VoteType != 0)
 			{
 				m_VoteCreator = ClientID;
 				StartVote(aDesc, aCmd, pReason);
@@ -1264,7 +1259,7 @@ void CGameContext::ConPause(IConsole::IResult *pResult, void *pUserData)
 	if (pResult->NumArguments())
 		pSelf->m_pController->DoPause(clamp(pResult->GetInteger(0), -1, 1000));
 	else
-		pSelf->m_pController->DoPause(pSelf->m_pController->IsGamePaused() ? 0 : IGameController::TIMER_INFINITE);
+		pSelf->m_pController->DoPause(pSelf->m_pController->IsGamePaused() ? 0 : CGameController::TIMER_INFINITE);
 }
 
 void CGameContext::ConChangeMap(IConsole::IResult *pResult, void *pUserData)
@@ -1628,18 +1623,7 @@ void CGameContext::OnInit()
 	m_Collision.Init(&m_Layers);
 
 	// select gametype
-	if (str_comp_nocase(Config()->m_SvGametype, "mod") == 0)
-		m_pController = new CGameControllerMOD(this);
-	else if (str_comp_nocase(Config()->m_SvGametype, "ctf") == 0)
-		m_pController = new CGameControllerCTF(this);
-	else if (str_comp_nocase(Config()->m_SvGametype, "lms") == 0)
-		m_pController = new CGameControllerLMS(this);
-	else if (str_comp_nocase(Config()->m_SvGametype, "lts") == 0)
-		m_pController = new CGameControllerLTS(this);
-	else if (str_comp_nocase(Config()->m_SvGametype, "tdm") == 0)
-		m_pController = new CGameControllerTDM(this);
-	else
-		m_pController = new CGameControllerDM(this);
+	m_pController = new CGameController(this);
 
 	m_pController->RegisterChatCommands(CommandManager());
 

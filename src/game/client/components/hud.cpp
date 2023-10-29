@@ -1038,7 +1038,7 @@ void CHud::RenderManaBar(float x, float y, float Progress)
 
 	IGraphics::CQuadItem QuadStartFull(x, y, EndWidth, BarHeight);
 	RenderTools()->SelectSprite(&g_pData->m_aSprites[SPRITE_NINJA_BAR_FULL_LEFT]);
-	Graphics()->SetColor(255.f, 0.f, 0.f, 255.f);
+	Graphics()->SetColor(255.f, 32.f, 96.f, 255.f);
 	Graphics()->QuadsDrawTL(&QuadStartFull, 1);
 	x += EndWidth;
 
@@ -1068,13 +1068,13 @@ void CHud::RenderManaBar(float x, float y, float Progress)
 	else
 		RenderTools()->SelectSprite(&SpriteBarFull);
 
-	Graphics()->SetColor(255.f, 0.f, 0.f, 255.f);
+	Graphics()->SetColor(255.f, 32.f, 96.f, 255.f);
 
 	Graphics()->QuadsDrawTL(&QuadFull, 1);
 
 	// empty bar
 	// select the middle portion of the sprite so we don't get edge bleeding
-	const CDataSprite SpriteBarEmpty = g_pData->m_aSprites[SPRITE_NINJA_BAR_EMPTY];
+	const CDataSprite SpriteBarEmpty = g_pData->m_aSprites[SPRITE_NINJA_BAR_FULL];
 	{
 		float spx = SpriteBarEmpty.m_X + 0.1f;
 		float spy = SpriteBarEmpty.m_Y;
@@ -1089,7 +1089,7 @@ void CHud::RenderManaBar(float x, float y, float Progress)
 
 		Graphics()->QuadsSetSubset(x1, y1, x2, y2);
 	}
-
+	Graphics()->SetColor(1.f, 0.f, 1.f, 255.f);
 	IGraphics::CQuadItem QuadEmpty(x + FullBarWidth, y, EmptyBarWidth, BarHeight);
 	Graphics()->QuadsDrawTL(&QuadEmpty, 1);
 
@@ -1102,9 +1102,9 @@ void CHud::RenderManaBar(float x, float y, float Progress)
 
 	Graphics()->QuadsEnd();
 	CUIRect Rect;
-	Rect.x = x + 12.f;
-	Rect.y = y;
-	UI()->DoLabel(&Rect, Localize("<-Mana Bar"), 12.f);
+	Rect.x = x + 8.f;
+	Rect.y = y - 1.f;
+	UI()->DoLabel(&Rect, Localize("<-Mana Bar"), 10.f);
 
 	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_GAME].m_Id);
 	Graphics()->WrapClamp();

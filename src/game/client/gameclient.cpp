@@ -52,6 +52,7 @@
 #include "components/spectator.h"
 #include "components/stats.h"
 #include "components/voting.h"
+#include "components/magic.h"
 
 inline void AppendDecimals(char *pBuf, int Size, int Time, int Precision)
 {
@@ -113,6 +114,7 @@ static CDamageInd gsDamageInd;
 static CVoting gs_Voting;
 static CSpectator gs_Spectator;
 static CStats gs_Stats;
+static CMagic gs_Magic;
 
 static CPlayers gs_Players;
 static CNamePlates gs_NamePlates;
@@ -280,6 +282,7 @@ void CGameClient::OnConsoleInit()
 	m_All.Add(&gs_Hud);
 	m_All.Add(&gs_Spectator);
 	m_All.Add(&gs_Emoticon);
+	m_All.Add(&gs_Magic);
 	m_All.Add(&gs_InfoMessages);
 	m_All.Add(m_pChat);
 	m_All.Add(&gs_Broadcast);
@@ -302,6 +305,7 @@ void CGameClient::OnConsoleInit()
 	m_Input.Add(m_pMenus);
 	m_Input.Add(&gs_Spectator);
 	m_Input.Add(&gs_Emoticon);
+	m_Input.Add(&gs_Magic);
 	m_Input.Add(m_pControls);
 	m_Input.Add(m_pBinds);
 

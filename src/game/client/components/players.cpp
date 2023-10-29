@@ -437,6 +437,85 @@ void CPlayers::RenderPlayer(
 		Graphics()->QuadsEnd();
 	}
 
+	{
+		const int Max = g_pData->m_Mana.m_Max;
+		float Progress = clamp(Player.m_Mana, 0, Max) / (float)Max;
+		Graphics()->TextureSet(g_pData->m_aImages[IMAGE_GAME].m_Id);
+		Graphics()->QuadsBegin();
+		float x = Position.x - 32.f;
+		float y = Position.y - 40.f;
+		Progress = clamp(Progress, 0.0f, 1.0f);
+		const float EndWidth = 6.0f;
+		const float BarHeight = 18.0f;
+		const float WholeBarWidth = 64.f;
+		const float MiddleBarWidth = WholeBarWidth - (EndWidth * 2.0f);
+
+		IGraphics::CQuadItem QuadStartFull(x, y, EndWidth, BarHeight);
+		RenderTools()->SelectSprite(&g_pData->m_aSprites[SPRITE_NINJA_BAR_FULL_LEFT]);
+		Graphics()->SetColor(255.f, 32.f, 96.f, 255.f);
+		Graphics()->QuadsDrawTL(&QuadStartFull, 1);
+		x += EndWidth;
+
+		const float FullBarWidth = MiddleBarWidth * Progress;
+		const float EmptyBarWidth = MiddleBarWidth - FullBarWidth;
+
+		// full bar
+		IGraphics::CQuadItem QuadFull(x, y, FullBarWidth, BarHeight);
+
+		CDataSprite SpriteBarFull = g_pData->m_aSprites[SPRITE_NINJA_BAR_FULL];
+		// prevent pixel puree, select only a small slice
+		if (Progress < 0.1f)
+		{
+			int spx = SpriteBarFull.m_X;
+			int spy = SpriteBarFull.m_Y;
+			float w = SpriteBarFull.m_W * 0.1f; // magic here
+			int h = SpriteBarFull.m_H;
+			int cx = SpriteBarFull.m_pSet->m_Gridx;
+			int cy = SpriteBarFull.m_pSet->m_Gridy;
+			float x1 = spx / (float)cx;
+			float x2 = (spx + w - 1 / 32.0f) / (float)cx;
+			float y1 = spy / (float)cy;
+			float y2 = (spy + h - 1 / 32.0f) / (float)cy;
+
+			Graphics()->QuadsSetSubset(x1, y1, x2, y2);
+		}
+		else
+			RenderTools()->SelectSprite(&SpriteBarFull);
+
+		Graphics()->SetColor(255.f, 32.f, 96.f, 255.f);
+
+		Graphics()->QuadsDrawTL(&QuadFull, 1);
+
+		// empty bar
+		// select the middle portion of the sprite so we don't get edge bleeding
+		const CDataSprite SpriteBarEmpty = g_pData->m_aSprites[SPRITE_NINJA_BAR_FULL];
+		{
+			float spx = SpriteBarEmpty.m_X + 0.1f;
+			float spy = SpriteBarEmpty.m_Y;
+			float w = SpriteBarEmpty.m_W * 0.5f;
+			int h = SpriteBarEmpty.m_H;
+			int cx = SpriteBarEmpty.m_pSet->m_Gridx;
+			int cy = SpriteBarEmpty.m_pSet->m_Gridy;
+			float x1 = spx / (float)cx;
+			float x2 = (spx + w - 1 / 32.0f) / (float)cx;
+			float y1 = spy / (float)cy;
+			float y2 = (spy + h - 1 / 32.0f) / (float)cy;
+
+			Graphics()->QuadsSetSubset(x1, y1, x2, y2);
+		}
+		Graphics()->SetColor(1.f, 0.f, 1.f, 255.f);
+		IGraphics::CQuadItem QuadEmpty(x + FullBarWidth, y, EmptyBarWidth, BarHeight);
+		Graphics()->QuadsDrawTL(&QuadEmpty, 1);
+
+		x += MiddleBarWidth;
+
+		IGraphics::CQuadItem QuadEndEmpty(x, y, EndWidth, BarHeight);
+		RenderTools()->SelectSprite(&g_pData->m_aSprites[SPRITE_NINJA_BAR_EMPTY_RIGHT]);
+		Graphics()->SetColor(1.f, 0.f, 1.f, 255.f);
+		Graphics()->QuadsDrawTL(&QuadEndEmpty, 1);
+
+		Graphics()->QuadsEnd();
+	}
 	CGameClient::CClientData *pClientData = &m_pClient->m_aClients[ClientID];
 	if (pClientData->m_EmoticonStart != -1 && pClientData->m_Emoticon >= 0 && pClientData->m_Emoticon < NUM_EMOTICONS)
 	{

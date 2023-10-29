@@ -18,7 +18,7 @@ class CGameClient : public IGameClient
 	public:
 		enum
 		{
-			MAX_COMPONENTS = 128,
+			MAX_COMPONENTS = 256,
 		};
 
 		CStack();

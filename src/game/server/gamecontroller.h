@@ -15,7 +15,7 @@
 		Controls the main game logic. Keeping track of team and player score,
 		winning conditions and specific game logic.
 */
-class IGameController
+class CGameController
 {
 	class CGameContext *m_pGameServer;
 	class CConfig *m_pConfig;
@@ -30,7 +30,7 @@ class IGameController
 	// balancing
 	enum
 	{
-		TBALANCE_CHECK=-2,
+		TBALANCE_CHECK = -2,
 		TBALANCE_OK,
 	};
 	int m_aTeamSize[NUM_TEAMS];
@@ -44,25 +44,25 @@ class IGameController
 	enum EGameState
 	{
 		// internal game states
-		IGS_WARMUP_GAME,		// warmup started by game because there're not enough players (infinite)
-		IGS_WARMUP_USER,		// warmup started by user action via rcon or new match (infinite or timer)
+		IGS_WARMUP_GAME, // warmup started by game because there're not enough players (infinite)
+		IGS_WARMUP_USER, // warmup started by user action via rcon or new match (infinite or timer)
 
-		IGS_START_COUNTDOWN,	// start countown to unpause the game or start match/round (tick timer)
+		IGS_START_COUNTDOWN, // start countown to unpause the game or start match/round (tick timer)
 
-		IGS_GAME_PAUSED,		// game paused (infinite or tick timer)
-		IGS_GAME_RUNNING,		// game running (infinite)
+		IGS_GAME_PAUSED,  // game paused (infinite or tick timer)
+		IGS_GAME_RUNNING, // game running (infinite)
 
-		IGS_END_MATCH,			// match is over (tick timer)
-		IGS_END_ROUND,			// round is over (tick timer)
- 	};
+		IGS_END_MATCH, // match is over (tick timer)
+		IGS_END_ROUND, // round is over (tick timer)
+	};
 	EGameState m_GameState;
 	int m_GameStateTimer;
 
-	virtual bool DoWincheckMatch();		// returns true when the match is over
+	virtual bool DoWincheckMatch(); // returns true when the match is over
 	virtual void DoWincheckRound() {}
 	bool HasEnoughPlayers() const { return (IsTeamplay() && m_aTeamSize[TEAM_RED] > 0 && m_aTeamSize[TEAM_BLUE] > 0) || (!IsTeamplay() && m_aTeamSize[TEAM_RED] > 1); }
 	void ResetGame();
-	void SetGameState(EGameState GameState, int Timer=0);
+	void SetGameState(EGameState GameState, int Timer = 0);
 	void StartMatch();
 	void StartRound();
 
@@ -78,7 +78,7 @@ class IGameController
 		{
 			m_Got = false;
 			m_FriendlyTeam = -1;
-			m_Pos = vec2(100,100);
+			m_Pos = vec2(100, 100);
 		}
 
 		vec2 m_Pos;
@@ -109,7 +109,7 @@ protected:
 	int m_aTeamscore[NUM_TEAMS];
 
 	void EndMatch() { SetGameState(IGS_END_MATCH, TIMER_END); }
-	void EndRound() { SetGameState(IGS_END_ROUND, TIMER_END/2); }
+	void EndRound() { SetGameState(IGS_END_ROUND, TIMER_END / 2); }
 
 	// info
 	int m_GameFlags;
@@ -125,8 +125,8 @@ protected:
 	void UpdateGameInfo(int ClientID);
 
 public:
-	IGameController(class CGameContext *pGameServer);
-	virtual ~IGameController() {}
+	CGameController(class CGameContext *pGameServer);
+	virtual ~CGameController() {}
 
 	// event
 	/*
@@ -187,8 +187,7 @@ public:
 	}
 	void AbortWarmup()
 	{
-		if((m_GameState == IGS_WARMUP_GAME || m_GameState == IGS_WARMUP_USER)
-			&& m_GameStateTimer != TIMER_INFINITE)
+		if ((m_GameState == IGS_WARMUP_GAME || m_GameState == IGS_WARMUP_USER) && m_GameStateTimer != TIMER_INFINITE)
 		{
 			SetGameState(IGS_GAME_RUNNING);
 		}
@@ -207,15 +206,15 @@ public:
 	bool IsGameRunning() const { return m_GameState == IGS_GAME_RUNNING; }
 	bool IsPlayerReadyMode() const;
 	bool IsTeamChangeAllowed() const;
-	bool IsTeamplay() const { return m_GameFlags&GAMEFLAG_TEAMS; }
-	bool IsSurvival() const { return m_GameFlags&GAMEFLAG_SURVIVAL; }
+	bool IsTeamplay() const { return m_GameFlags & GAMEFLAG_TEAMS; }
+	bool IsSurvival() const { return m_GameFlags & GAMEFLAG_SURVIVAL; }
 
 	const char *GetGameType() const { return m_pGameType; }
 
 	// map
 	void ChangeMap(const char *pToMap);
 
-	//spawn
+	// spawn
 	bool CanSpawn(int Team, vec2 *pPos) const;
 	bool GetStartRespawnState() const;
 
@@ -223,13 +222,17 @@ public:
 	bool CanJoinTeam(int Team, int NotThisID) const;
 	bool CanChangeTeam(CPlayer *pPplayer, int JoinTeam) const;
 
-	void DoTeamChange(class CPlayer *pPlayer, int Team, bool DoChatMsg=true);
-	void ForceTeamBalance() { if(!(m_GameFlags&GAMEFLAG_SURVIVAL)) DoTeamBalance(); }
+	void DoTeamChange(class CPlayer *pPlayer, int Team, bool DoChatMsg = true);
+	void ForceTeamBalance()
+	{
+		if (!(m_GameFlags & GAMEFLAG_SURVIVAL))
+			DoTeamBalance();
+	}
 
-	int GetRealPlayerNum() const { return m_aTeamSize[TEAM_RED]+m_aTeamSize[TEAM_BLUE]; }
+	int GetRealPlayerNum() const { return m_aTeamSize[TEAM_RED] + m_aTeamSize[TEAM_BLUE]; }
 	int GetStartTeam();
 
-	//static void Com_Example(IConsole::IResult *pResult, void *pContext);
+	// static void Com_Example(IConsole::IResult *pResult, void *pContext);
 	virtual void RegisterChatCommands(CCommandManager *pManager);
 };
 

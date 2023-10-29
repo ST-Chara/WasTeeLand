@@ -79,7 +79,7 @@ private:
 		int m_AmmoRegenStart;
 		int m_Ammo;
 		bool m_Got;
-
+		bool m_Charged;
 	} m_aWeapons[NUM_WEAPONS];
 
 	int m_ActiveWeapon;

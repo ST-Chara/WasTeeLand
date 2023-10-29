@@ -408,16 +408,17 @@ void CCharacter::FireWeapon()
 			if ((pTarget == this) || GameServer()->Collision()->IntersectLine(ProjStartPos, pTarget->m_Pos, NULL, NULL))
 				continue;
 
-			if (m_CurrentMana >= 10)
-			{
-				if (length(pTarget->m_Pos - ProjStartPos) > 0.0f)
-					GameServer()->CreateSparks(pTarget->m_Pos - normalize(pTarget->m_Pos - ProjStartPos) * GetProximityRadius() * 0.5f, 50, GetPlayer()->GetCID(), WEAPON_SCYTHE, 1);
-				else
-					GameServer()->CreateSparks(ProjStartPos, 50, GetPlayer()->GetCID(), WEAPON_SCYTHE, 6);
-				m_CurrentMana -= 10;
-			}
 			pTarget->TakeDamage(vec2(0.f, 0.f), vec2(0.f, 0.f), g_pData->m_Weapons.m_Scythe.m_pBase->m_Damage,
 								m_pPlayer->GetCID(), m_ActiveWeapon);
+			Hits++;
+		}
+		if(Hits > 0)
+		{
+			if (m_CurrentMana >= 2)
+			{
+				GameServer()->CreateSparks(ProjStartPos, 50, GetPlayer()->GetCID(), WEAPON_SCYTHE, 6);
+				m_CurrentMana -= 2;
+			}
 		}
 	}
 	break;

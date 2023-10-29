@@ -53,6 +53,8 @@ static CKeyInfo gs_aKeys[] =
 	{ "Add demo marker", "add_demomarker", 0, 0},
 	{ "Toggle sounds", "snd_toggle", 0, 0},
 	{ "Toggle dynamic camera", "toggle cl_dynamic_camera 1 0", 0, 0},
+
+	{ "Magic Select", "+magic", 0, 0},
 };
 
 /*	This is for scripts/update_localization.py to work, don't remove!
@@ -61,6 +63,7 @@ static CKeyInfo gs_aKeys[] =
 	Localize("Vote yes");Localize("Vote no");Localize("Chat");Localize("Team chat");Localize("Whisper");Localize("Show chat");Localize("Emoticon");
 	Localize("Spectator mode");Localize("Spectate next");Localize("Spectate previous");Localize("Console");Localize("Remote console");
 	Localize("Screenshot");Localize("Scoreboard");Localize("Statboard");Localize("Respawn");Localize("Ready");Localize("Add demo marker");Localize("Toggle sounds");Localize("Toggle dynamic camera")
+	Localize("Magic Select")
 */
 
 const int g_KeyCount = sizeof(gs_aKeys) / sizeof(CKeyInfo);
@@ -371,12 +374,30 @@ float CMenus::RenderSettingsControlsMisc(CUIRect View)
 	int StartOption = 20;
 	float ButtonHeight = 20.0f;
 	float Spacing = 2.0f;
-	float BackgroundHeight = (float)NumOptions*ButtonHeight+(float)NumOptions*Spacing;
+	float BackgroundHeight = (float)NumOptions * ButtonHeight + (float)NumOptions * Spacing;
 
 	View.HSplitTop(BackgroundHeight, &View, 0);
 	View.Draw(vec4(0.0f, 0.0f, 0.0f, 0.25f), 5.0f, CUIRect::CORNER_B);
 
-	DoSettingsControlsButtons(StartOption, StartOption+NumOptions, View, ButtonHeight, Spacing);
+	DoSettingsControlsButtons(StartOption, StartOption + NumOptions, View, ButtonHeight, Spacing);
+
+	return BackgroundHeight;
+}
+
+float CMenus::RenderSettingsControlsMagic(CUIRect View)
+{
+	UpdateBindKeys(m_pClient->m_pBinds);
+
+	int NumOptions = 1;
+	int StartOption = 32;
+	float ButtonHeight = 20.0f;
+	float Spacing = 0.5f;
+	float BackgroundHeight = (float)NumOptions * ButtonHeight + (float)NumOptions * Spacing;
+
+	View.HSplitTop(BackgroundHeight, &View, 0);
+	View.Draw(vec4(0.0f, 0.0f, 0.0f, 0.25f), 5.0f, CUIRect::CORNER_B);
+
+	DoSettingsControlsButtons(StartOption, StartOption + NumOptions, View, ButtonHeight, Spacing);
 
 	return BackgroundHeight;
 }
