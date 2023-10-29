@@ -1737,3 +1737,19 @@ const char *CGameContext::NetVersionHashUsed() const { return GAME_NETVERSION_HA
 const char *CGameContext::NetVersionHashReal() const { return GAME_NETVERSION_HASH; }
 
 IGameServer *CreateGameServer() { return new CGameContext; }
+
+// MineTee
+int CGameContext::SendTileModif(int ClientID, ivec2 Pos, int Group, int Layer, int Index, int Flags, int Reserved)
+{
+	CNetMsg_SvAn_TileModif TileModif;
+	TileModif.m_X = Pos.x;
+	TileModif.m_Y = Pos.y;
+	TileModif.m_Group = Group;
+	TileModif.m_Layer = Layer;
+	TileModif.m_Index = Index;
+	TileModif.m_Flags = Flags;
+	TileModif.m_Reserved = Reserved;
+
+	m_pServer->SendPackMsg(&TileModif, MSGFLAG_VITAL, ClientID);
+	return 0;
+}

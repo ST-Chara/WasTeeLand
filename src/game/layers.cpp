@@ -1,6 +1,7 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include "layers.h"
+#include <game/gamecore.h> // MineTee
 
 CLayers::CLayers()
 {
@@ -11,10 +12,19 @@ CLayers::CLayers()
 	m_pGameGroup = 0;
 	m_pGameLayer = 0;
 	m_pMap = 0;
+
+	// MineTee
+	m_MineTeeGroupIndex = 0;
+	m_MineTeeLayerIndex = 0;
+	m_GameGroupIndex = 0;
+	m_GameLayerIndex = 0;
 }
 
 void CLayers::Init(class IKernel *pKernel, IMap *pMap)
 {
+	m_MineTeeGroupIndex = 0;
+	m_MineTeeLayerIndex = 0;
+	
 	m_pMap = pMap ? pMap : pKernel->RequestInterface<IMap>();
 	m_pMap->GetType(MAPITEMTYPE_GROUP, &m_GroupsStart, &m_GroupsNum);
 	m_pMap->GetType(MAPITEMTYPE_LAYER, &m_LayersStart, &m_LayersNum);
@@ -31,11 +41,26 @@ void CLayers::InitGameLayer()
 		for(int l = 0; l < pGroup->m_NumLayers; l++)
 		{
 			CMapItemLayer *pLayer = GetLayer(pGroup->m_StartLayer+l);
+			CMapItemLayerTilemap *pTilemap = reinterpret_cast<CMapItemLayerTilemap *>(pLayer);
+
+			// MineTee
+			char layerName[64] = {0};
+			IntsToStr(pTilemap->m_aName, sizeof(pTilemap->m_aName) / sizeof(int), layerName);
+
+			if (!m_pMineTeeLayer && str_comp_nocase(layerName, "Test") == 0)
+			{
+				m_MineTeeGroupIndex = g;
+				m_MineTeeLayerIndex = l;
+				m_pMineTeeLayer = pTilemap;
+			}
+
 			if(pLayer->m_Type == LAYERTYPE_TILES)
 			{
 				CMapItemLayerTilemap *pTilemap = reinterpret_cast<CMapItemLayerTilemap *>(pLayer);
 				if(pTilemap->m_Flags&TILESLAYERFLAG_GAME)
 				{
+					m_GameGroupIndex = g;
+					m_GameLayerIndex = l;
 					m_pGameLayer = pTilemap;
 					m_pGameGroup = pGroup;
 

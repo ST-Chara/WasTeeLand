@@ -81,6 +81,7 @@ public:
 	class IStorage *Storage() { return m_pStorage; }
 	CCollision *Collision() { return &m_Collision; }
 	CTuningParams *Tuning() { return &m_Tuning; }
+	CLayers *Layers() { return &m_Layers; } // MineTee
 
 	CGameContext();
 	~CGameContext();
@@ -197,6 +198,9 @@ public:
 	virtual const char *NetVersion() const;
 	virtual const char *NetVersionHashUsed() const;
 	virtual const char *NetVersionHashReal() const;
+
+	// MineTee
+	int SendTileModif(int ClientID, ivec2 Pos, int Group, int Layer, int Index, int Flags, int Reserved);
 };
 
 inline int64 CmaskAll() { return -1; }

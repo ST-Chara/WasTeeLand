@@ -883,6 +883,7 @@ set(EXPECTED_DATA
   editor/checker.png
   editor/cursor.png
   editor/entities.png
+  editor/grass_main.rules
   emoticons.png
   fonts/DejaVuSans.ttf
   fonts/SourceHanSans.ttc

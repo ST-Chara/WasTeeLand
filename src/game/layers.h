@@ -19,6 +19,13 @@ class CLayers
 	void InitGameLayer();
 	void InitTilemapSkip();
 
+	// MineTee
+	int m_GameGroupIndex;
+	int m_GameLayerIndex;
+	int m_MineTeeGroupIndex;
+	int m_MineTeeLayerIndex;
+	CMapItemLayerTilemap *m_pMineTeeLayer;
+
 public:
 	CLayers();
 	void Init(class IKernel *pKernel, class IMap *pMap=0);
@@ -29,6 +36,13 @@ public:
 	CMapItemLayerTilemap *GameLayer() const { return m_pGameLayer; }
 	CMapItemGroup *GetGroup(int Index) const;
 	CMapItemLayer *GetLayer(int Index) const;
+
+	// MineTee
+	int GetGameGroupIndex() const { return m_GameGroupIndex; }
+	int GetGameLayerIndex() const { return m_GameLayerIndex; }
+	int GetMineTeeGroupIndex() const { return m_MineTeeGroupIndex; }
+	int GetMineTeeLayerIndex() const { return m_MineTeeLayerIndex; }
+	CMapItemLayerTilemap *MineTeeLayer() const { return m_pMineTeeLayer; };
 };
 
 #endif

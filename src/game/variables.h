@@ -150,4 +150,7 @@ MACRO_CONFIG_INT(SvVoteKickBantime, sv_vote_kick_bantime, 5, 0, 1440, CFGFLAG_SA
 
 MACRO_CONFIG_INT(DbgFocus, dbg_focus, 0, 0, 1, CFGFLAG_CLIENT, "")
 MACRO_CONFIG_INT(DbgTuning, dbg_tuning, 0, 0, 1, CFGFLAG_CLIENT, "")
+
+MACRO_CONFIG_INT(MapHeight, map_height, 500, 10, 50000, CFGFLAG_SERVER, "DO NOT EDIT IT")
+MACRO_CONFIG_INT(MapWidth, map_width, 500, 10, 50000, CFGFLAG_SERVER, "DO NOT EDIT IT")
 #endif

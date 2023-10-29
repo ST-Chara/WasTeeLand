@@ -206,3 +206,117 @@ void CCollision::MoveBox(vec2 *pInoutPos, vec2 *pInoutVel, vec2 Size, float Elas
 	*pInoutPos = Pos;
 	*pInoutVel = Vel;
 }
+
+void CCollision::RegenerateSkip(CTile *pTiles, int Width, int Height, ivec2 Pos, bool Delete)
+{
+	if (!pTiles || Pos.x < 0 || Pos.x >= Width || Pos.y < 0 || Pos.y >= Height)
+		return;
+
+	int sx, i;
+
+	if (Delete)
+	{
+		// Back Tile
+		for (i = Pos.x - 1; i >= 1; i--)
+		{
+			if (pTiles[Pos.y * Width + i].m_Index)
+				break;
+		}
+		i = maximum(1, i);
+		pTiles[Pos.y * Width + i].m_Skip += pTiles[Pos.y * Width + Pos.x].m_Skip + 1;
+		// Current Tile
+		pTiles[Pos.y * Width + Pos.x].m_Skip = 0;
+	}
+	else
+	{
+		// Back Tile
+		for (i = Pos.x - 1, sx = 0; i >= 1; i--)
+		{
+			if (!pTiles[Pos.y * Width + i].m_Index)
+				++sx;
+			else
+				break;
+		}
+		i = maximum(1, i);
+		pTiles[Pos.y * Width + i].m_Skip = sx;
+		// Current Tile
+		for (i = Pos.x + 1, sx = 0; i < Width; i++)
+		{
+			if (!pTiles[Pos.y * Width + i].m_Index)
+				++sx;
+			else
+				break;
+		}
+		pTiles[Pos.y * Width + Pos.x].m_Skip = sx;
+	}
+}
+
+bool CCollision::ModifTile(ivec2 pos, int group, int layer, int index, int flags, int reserved, bool limited, bool regen)
+{
+	CMapItemGroup *pGroup = m_pLayers->GetGroup(group);
+	CMapItemLayer *pLayer = m_pLayers->GetLayer(pGroup->m_StartLayer + layer);
+	if (pLayer->m_Type != LAYERTYPE_TILES || (limited && pos.y <= 1))
+		return false;
+
+	CMapItemLayerTilemap *pTilemap = reinterpret_cast<CMapItemLayerTilemap *>(pLayer);
+	int TotalTiles = pTilemap->m_Width * pTilemap->m_Height;
+	int tpos = (int)pos.y * pTilemap->m_Width + (int)pos.x;
+	if (tpos < 0 || tpos >= TotalTiles)
+		return false;
+
+	if (pTilemap == m_pLayers->GameLayer())
+	{
+		CTile *pTiles = static_cast<CTile *>(m_pLayers->Map()->GetData(pTilemap->m_Data));
+		pTiles[tpos].m_Flags = flags;
+		pTiles[tpos].m_Index = index;
+		pTiles[tpos].m_Reserved = reserved;
+
+		if (regen)
+			RegenerateSkip(pTiles, pTilemap->m_Width, pTilemap->m_Height, pos, !index);
+
+		if (index == 0)
+		{
+			m_pTiles[tpos].m_Index = 0;
+			m_pTiles[tpos].m_Flags = 0;
+		}
+		else
+		{
+			m_pTiles[tpos].m_Index = COLFLAG_SOLID;
+			m_pTiles[tpos].m_Flags = 0;
+		}
+	}
+	else if (pTilemap != m_pLayers->GameLayer())
+	{
+		CTile *pTiles = static_cast<CTile *>(m_pLayers->Map()->GetData(pTilemap->m_Data));
+		pTiles[tpos].m_Flags = flags;
+		pTiles[tpos].m_Index = index;
+		pTiles[tpos].m_Reserved = 1;
+
+		if (regen)
+			RegenerateSkip(pTiles, pTilemap->m_Width, pTilemap->m_Height, pos, !index);
+	}
+	else
+	{
+		m_pTiles[tpos].m_Index = index;
+		m_pTiles[tpos].m_Flags = flags;
+		m_pTiles[tpos].m_Reserved = 1;
+
+		switch (index)
+		{
+		case TILE_DEATH:
+			m_pTiles[tpos].m_Index = COLFLAG_DEATH;
+			break;
+		case TILE_SOLID:
+			m_pTiles[tpos].m_Index = COLFLAG_SOLID;
+			break;
+		case TILE_NOHOOK:
+			m_pTiles[tpos].m_Index = COLFLAG_SOLID | COLFLAG_NOHOOK;
+			break;
+		default:
+			if (index <= 128)
+				m_pTiles[tpos].m_Index = 0;
+		}
+	}
+
+	return true;
+}

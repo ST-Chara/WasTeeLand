@@ -376,6 +376,15 @@ void CCharacter::FireWeapon()
 		{
 			GameServer()->CreateSound(GetPos(), SOUND_HOOK_NOATTACH);
 		}
+
+		const float Zoom = 1.35f;
+		ivec2 TilePos = ivec2((m_Pos.x+m_LatestInput.m_TargetX*Zoom)/32.0f, (m_Pos.y+m_LatestInput.m_TargetY*Zoom)/32.0f);
+		if (GameServer()->Collision()->ModifTile(TilePos, GameServer()->Layers()->GetGameGroupIndex(), GameServer()->Layers()->GetGameLayerIndex(), TILE_SOLID, 0, 0))
+		{
+			GameServer()->SendTileModif(-1, TilePos, GameServer()->Layers()->GetGameGroupIndex(), GameServer()->Layers()->GetGameLayerIndex(), TILE_SOLID, 0, 0);
+			GameServer()->SendTileModif(-1, TilePos, GameServer()->Layers()->GetMineTeeGroupIndex(), GameServer()->Layers()->GetMineTeeLayerIndex(), TILE_SOLID, 0, 0);
+			GameServer()->CreateSound(m_Pos, SOUND_NINJA_HIT);
+		}
 	}
 	break;
 

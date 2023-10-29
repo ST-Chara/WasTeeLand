@@ -1032,6 +1032,12 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker)
 		DoLeaveMessage(pMsg->m_pName, pMsg->m_ClientID, pMsg->m_pReason);
 		m_pStats->OnPlayerLeave(pMsg->m_ClientID);
 	}
+	else if (MsgId == NETMSGTYPE_SVAN_TILEMODIF) // MineTee
+	{
+		CNetMsg_SvAn_TileModif *pMsg = (CNetMsg_SvAn_TileModif *)pRawMsg;
+
+		Collision()->ModifTile(ivec2(pMsg->m_X, pMsg->m_Y), pMsg->m_Group, pMsg->m_Layer, pMsg->m_Index, pMsg->m_Flags, pMsg->m_Reserved);
+	}
 }
 
 void CGameClient::OnStateChange(int NewState, int OldState)
