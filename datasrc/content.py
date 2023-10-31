@@ -186,6 +186,10 @@ class Weapon_Scythe(Struct):
         Struct.__init__(self, "CDataWeaponspecScythe")
         self.base = Pointer(WeaponSpec, WeaponSpec())
 
+class Weapon_Block(Struct):
+    def __init__(self):
+        Struct.__init__(self, "CDataWeaponspecBlock")
+        self.base = Pointer(WeaponSpec, WeaponSpec())
 
 class Weapons(Struct):
     def __init__(self):
@@ -199,6 +203,7 @@ class Weapons(Struct):
         self.sword = Weapon_Sword()
         self.spark = Weapon_Spark()
         self.scythe = Weapon_Scythe()
+        self.block = Weapon_Block()
         self.id = Array(WeaponSpec())
 
 
@@ -328,7 +333,7 @@ container.sounds.Add(SoundSet("menu", ["audio/music_menu.wv"]))
 image_null = Image("null", "")
 image_particles = Image("particles", "particles.png")
 image_game = Image("game", "game.png")
-image_testblock = Image("testblock", "testblock.png")
+image_blocks = Image("blocks", "blocks.png")
 image_browseicons = Image("browseicons", "ui/icons/browse.png", 1)
 image_browsericon = Image("browser", "ui/icons/browser.png", 1)
 image_emoticons = Image("emoticons", "emoticons.png")
@@ -351,14 +356,15 @@ image_sword = Image("sword", "sword.png")
 image_spark = Image("spark", "sparks.png")
 image_spark_w = Image("spark_w", "sparks.png")
 image_scythe = Image("scythe", "scythe.png")
+image_testblocks = Image("testblocks", "testblocks.png")
 
 container.images.Add(image_null)
 container.images.Add(image_game)
 container.images.Add(Image("deadtee", "deadtee.png"))
 container.images.Add(image_particles)
-container.images.Add(image_testblock)
 container.images.Add(Image("cursor", "ui/gui_cursor.png"))
 container.images.Add(Image("banner", "ui/gui_logo.png"))
+container.images.Add(image_blocks)
 container.images.Add(image_emoticons)
 container.images.Add(image_browseicons)
 container.images.Add(image_browsericon)
@@ -384,6 +390,7 @@ container.images.Add(image_sword)
 container.images.Add(image_spark)
 container.images.Add(image_spark_w)
 container.images.Add(image_scythe)
+container.images.Add(image_testblocks)
 
 container.pickups.Add(Pickup("health"))
 container.pickups.Add(Pickup("armor"))
@@ -396,7 +403,6 @@ container.pickups.Add(Pickup("hammer"))
 
 set_particles = SpriteSet("particles", image_particles, 8, 8)
 set_game = SpriteSet("game", image_game, 32, 16)
-set_testblock = SpriteSet("testblock", image_testblock, 16, 16)
 set_tee_body = SpriteSet("tee_body", image_null, 2, 2)
 set_tee_markings = SpriteSet("tee_markings", image_null, 1, 1)
 set_tee_decoration = SpriteSet("tee_decoration", image_null, 2, 1)
@@ -405,6 +411,7 @@ set_tee_feet = SpriteSet("tee_feet", image_null, 2, 1)
 set_tee_eyes = SpriteSet("tee_eyes", image_null, 2, 4)
 set_tee_hats = SpriteSet("tee_hats", image_null, 1, 4)
 set_tee_bot = SpriteSet("tee_bot", image_null, 12, 5)
+set_blocks = SpriteSet("blocks", image_blocks, 4, 2)
 set_browseicons = SpriteSet("browseicons", image_browseicons, 4, 2)
 set_browsericon = SpriteSet("browsericon", image_browsericon, 1, 2)
 set_emoticons = SpriteSet("emoticons", image_emoticons, 4, 4)
@@ -425,9 +432,11 @@ set_sword = SpriteSet("sword", image_sword, 32, 8)
 set_spark = SpriteSet("spark", image_spark, 4, 2)
 set_spark_w = SpriteSet("spark_w", image_spark_w, 30, 4)
 set_scythe = SpriteSet("scythe", image_scythe, 4, 1)
+set_testblocks = SpriteSet("testblocks", image_testblocks, 16, 16)
 
 container.spritesets.Add(set_particles)
 container.spritesets.Add(set_game)
+container.spritesets.Add(set_blocks)
 container.spritesets.Add(set_tee_body)
 container.spritesets.Add(set_tee_markings)
 container.spritesets.Add(set_tee_decoration)
@@ -456,6 +465,7 @@ container.spritesets.Add(set_sword)
 container.spritesets.Add(set_spark)
 container.spritesets.Add(set_spark_w)
 container.spritesets.Add(set_scythe)
+container.spritesets.Add(set_testblocks)
 
 
 container.sprites.Add(Sprite("part_slice", set_particles, 0, 0, 1, 1))
@@ -703,11 +713,9 @@ container.sprites.Add(Sprite("weapon_scythe_body", set_scythe, 0, 0, 1, 1))
 container.sprites.Add(Sprite("weapon_scythe_cursor", set_game, 0, 0, 2, 2))
 container.sprites.Add(Sprite("weapon_scythe_proj", set_game, 0, 0, 0, 0))
 
-# num_blocks = 0
-# for x in range(0, 16):
-# 	for y in range(0, 16):
-# 		num_blocks += 1
-# 		container.sprites.Add(Sprite("block"+str(num_blocks), set_testblock, x, y, 1, 1))
+container.sprites.Add(Sprite("weapon_block_body", set_blocks, 0, 1, 1, 1))
+container.sprites.Add(Sprite("weapon_block_cursor", set_blocks, 0, 1, 1, 1))
+container.sprites.Add(Sprite("weapon_block_proj", set_blocks, 0, 1, 1, 1))
 
 for i in range(1, 5):
     container.sprites.Add(
@@ -899,4 +907,13 @@ weapon.visual_size.Set(126)
 weapon.offsetx.Set(16)
 weapon.offsety.Set(-20)
 container.weapons.scythe.base.Set(weapon)
+container.weapons.id.Add(weapon)
+
+weapon = WeaponSpec(container, "block")
+weapon.firedelay.Set(50)
+weapon.damage.Set(0)
+weapon.visual_size.Set(48)
+weapon.offsetx.Set(14)
+weapon.offsety.Set(-4)
+container.weapons.block.base.Set(weapon)
 container.weapons.id.Add(weapon)

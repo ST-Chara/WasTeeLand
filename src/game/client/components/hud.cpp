@@ -621,10 +621,23 @@ void CHud::RenderCursor()
 
 	vec2 Pos = *m_pClient->m_pCamera->GetCenter();
 	RenderTools()->MapScreenToGroup(Pos.x, Pos.y, Layers()->GameGroup(), m_pClient->m_pCamera->GetZoom());
-	if (m_pClient->m_Snap.m_pLocalCharacter->m_Weapon % NUM_WEAPONS != WEAPON_SWORD)
-		Graphics()->TextureSet(g_pData->m_aImages[IMAGE_GAME].m_Id);
-	else
+	switch (m_pClient->m_Snap.m_pLocalCharacter->m_Weapon % NUM_WEAPONS)
+	{
+	case WEAPON_SWORD:
 		Graphics()->TextureSet(g_pData->m_aImages[IMAGE_SWORD].m_Id);
+		break;
+
+	case WEAPON_SPARK:
+		Graphics()->TextureSet(g_pData->m_aImages[IMAGE_SPARK].m_Id);
+		break;
+
+	case WEAPON_BLOCK:
+		return;
+
+	default:
+		Graphics()->TextureSet(g_pData->m_aImages[IMAGE_GAME].m_Id);
+		break;
+	}
 
 	Graphics()->QuadsBegin();
 

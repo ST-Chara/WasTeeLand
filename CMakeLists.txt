@@ -986,6 +986,8 @@ set(EXPECTED_DATA
   scythe.png
   sparks.png
   sword.png
+  testblocks.png
+  blocks.png
   skins/beaver.json
   skins/bluekitty.json
   skins/bluestripe.json
@@ -1424,6 +1426,8 @@ if(CLIENT)
     component.h
     components/binds.cpp
     components/binds.h
+    components/block.cpp
+    components/block.h
     components/broadcast.cpp
     components/broadcast.h
     components/camera.cpp
@@ -1599,6 +1603,8 @@ set_src(ENGINE_SERVER GLOB src/engine/server
 )
 set_src(GAME_SERVER GLOB_RECURSE src/game/server
   alloc.h
+  entities/block.cpp
+  entities/block.h
   entities/character.cpp
   entities/character.h
   entities/flag.cpp

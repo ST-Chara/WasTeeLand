@@ -251,11 +251,12 @@ void CGameController::OnCharacterSpawn(CCharacter *pChr)
 	pChr->IncreaseHealth(10);
 
 	// give default weapons
+	pChr->GiveWeapon(WEAPON_HAMMER, -1);
+	pChr->GiveWeapon(WEAPON_GUN, 10);
+	pChr->GiveWeapon(WEAPON_BLOCK, -1);
 	pChr->GiveWeapon(WEAPON_SCYTHE, -1);
 	pChr->GiveWeapon(WEAPON_SPARK, -1);
 	pChr->GiveWeapon(WEAPON_SWORD, -1);
-	pChr->GiveWeapon(WEAPON_HAMMER, -1);
-	pChr->GiveWeapon(WEAPON_GUN, 10);
 }
 
 void CGameController::OnFlagReturn(CFlag *pFlag)

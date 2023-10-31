@@ -23,6 +23,7 @@
 
 #include "gameclient.h"
 
+#include "components/block.h"
 #include "components/binds.h"
 #include "components/broadcast.h"
 #include "components/camera.h"
@@ -115,6 +116,7 @@ static CVoting gs_Voting;
 static CSpectator gs_Spectator;
 static CStats gs_Stats;
 static CMagic gs_Magic;
+static CBlock gs_Blocks;
 
 static CPlayers gs_Players;
 static CNamePlates gs_NamePlates;
@@ -253,6 +255,7 @@ void CGameClient::OnConsoleInit()
 	m_pVoting = &::gs_Voting;
 	m_pScoreboard = &::gs_Scoreboard;
 	m_pItems = &::gs_Items;
+	m_pBlocks = &::gs_Blocks;
 	m_pMapLayersBackGround = &::gs_MapLayersBackGround;
 	m_pMapLayersForeGround = &::gs_MapLayersForeGround;
 	m_pStats = &::gs_Stats;
@@ -273,6 +276,7 @@ void CGameClient::OnConsoleInit()
 	m_All.Add(&gs_MapLayersBackGround); // first to render
 	m_All.Add(&m_pParticles->m_RenderTrail);
 	m_All.Add(m_pItems);
+	m_All.Add(m_pBlocks);
 	m_All.Add(&gs_Players);
 	m_All.Add(&gs_MapLayersForeGround);
 	m_All.Add(&m_pParticles->m_RenderExplosions);
@@ -348,6 +352,7 @@ void CGameClient::OnConsoleInit()
 
 	//
 	m_SuppressEvents = false;
+	m_BuildingBlock = false;
 }
 
 void CGameClient::OnInit()

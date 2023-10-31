@@ -179,6 +179,8 @@ void CPlayers::RenderPlayer(
 			State.Add(&g_pData->m_aAnimations[ANIM_SWORD_RUSH], clamp(ct * 5.0f, 0.0f, 1.0f), 1.0f);
 		if (Player.m_Weapon == WEAPON_SPARK)
 			State.Add(&g_pData->m_aAnimations[ANIM_SPARK_FIRE], clamp(ct * 5.0f, 0.0f, 1.0f), 1.0f);
+		if (Player.m_Weapon == WEAPON_BLOCK)
+			State.Add(&g_pData->m_aAnimations[ANIM_SWORD_RUSH], clamp(ct * 2.0f, 0.0f, 1.0f), 1.0f);
 	}
 	// do skidding
 	if (!InAir && WantOtherDir && length(Vel * 50) > 500.0f)
@@ -211,6 +213,10 @@ void CPlayers::RenderPlayer(
 
 		case WEAPON_SCYTHE:
 			ImageToBeUse = IMAGE_SCYTHE;
+			break;
+
+		case WEAPON_BLOCK:
+			ImageToBeUse = IMAGE_BLOCKS;
 			break;
 
 		default:
@@ -279,7 +285,24 @@ void CPlayers::RenderPlayer(
 			else
 			{
 				Graphics()->QuadsSetRotation(-pi / 2 + State.GetAttach()->m_Angle * pi * 2);
+				p.x += g_pData->m_Weapons.m_aId[Weapon].m_Offsetx;
 			}
+			RenderTools()->DrawSprite(p.x, p.y, g_pData->m_Weapons.m_aId[Weapon].m_VisualSize);
+		}
+		break;
+
+		case WEAPON_BLOCK:
+		{
+			const float RecoilTick = (Client()->GameTick() - Player.m_AttackTick + s_LastIntraTick) / 5.0f;
+			const float Recoil = RecoilTick < 1.0f ? sinf(RecoilTick * pi) : 0.0f;
+			p = Position + Direction * -(g_pData->m_Weapons.m_aId[Weapon].m_Offsetx - Recoil * 40.0f);
+			p.y += g_pData->m_Weapons.m_aId[Weapon].m_Offsety;
+
+			if (Direction.x < 0)
+				p.x += g_pData->m_Weapons.m_aId[Weapon].m_Offsetx;
+			else
+				p.x -= g_pData->m_Weapons.m_aId[Weapon].m_Offsetx;
+
 			RenderTools()->DrawSprite(p.x, p.y, g_pData->m_Weapons.m_aId[Weapon].m_VisualSize);
 		}
 		break;
@@ -403,6 +426,7 @@ void CPlayers::RenderPlayer(
 		case WEAPON_SWORD:
 		case WEAPON_GUN:
 		case WEAPON_SPARK:
+		case WEAPON_BLOCK:
 			RenderTools()->RenderTeeHand(&RenderInfo, p, Direction, -3 * pi / 4, vec2(-15, 4));
 			break;
 		case WEAPON_SHOTGUN:

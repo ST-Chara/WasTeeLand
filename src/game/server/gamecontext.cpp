@@ -1753,3 +1753,15 @@ int CGameContext::SendTileModif(int ClientID, ivec2 Pos, int Group, int Layer, i
 	m_pServer->SendPackMsg(&TileModif, MSGFLAG_VITAL, ClientID);
 	return 0;
 }
+
+void CGameContext::OnBlockChange(vec2 Pos)
+{
+	// force characters to update and send the core
+	for (int i = 0; i < MAX_CLIENTS; i++)
+	{
+		CCharacter *pCharacter = GetPlayerChar(i);
+
+		if (pCharacter && abs(Pos.x - pCharacter->GetPos().x) < 1000 && abs(Pos.y - pCharacter->GetPos().y) < 1000)
+			pCharacter->m_ForceCoreSend = true;
+	}
+}

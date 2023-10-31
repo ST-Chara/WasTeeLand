@@ -321,6 +321,14 @@ Objects = [
             NetArray(NetIntAny("m_aTuneParams"), 32),
         ],
     ),
+    NetObject(
+        "Block",
+        [
+            NetIntAny("m_X"),
+            NetIntAny("m_Y"),
+            NetIntAny("m_Type"),
+        ],
+    ),
     ## Events
     NetEvent(
         "Common",
@@ -622,15 +630,25 @@ Messages = [
     NetMessage(
         "Cl_Command", [NetStringStrict("m_Name"), NetStringStrict("m_Arguments")]
     ),
-
-    # MineTee	
-	NetMessage("SvAn_TileModif", [
-		NetIntAny("m_X"),
-		NetIntAny("m_Y"),
-		NetIntAny("m_Group"),
-		NetIntAny("m_Layer"),
-		NetIntRange("m_Index", 0, 255),
-		NetIntAny("m_Flags"),
-		NetIntAny("m_Reserved"),
-	]),
+    # MineTee
+    NetMessage(
+        "SvAn_TileModif",
+        [
+            NetIntAny("m_X"),
+            NetIntAny("m_Y"),
+            NetIntAny("m_Group"),
+            NetIntAny("m_Layer"),
+            NetIntRange("m_Index", 0, 255),
+            NetIntAny("m_Flags"),
+            NetIntAny("m_Reserved"),
+        ],
+    ),
+    NetMessage(
+        "Cl_PutBlock",
+        [
+            NetIntAny("m_X"),
+            NetIntAny("m_Y"),
+            NetIntAny("m_Type"),
+        ],
+    ),
 ]

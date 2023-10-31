@@ -264,6 +264,8 @@ public:
 
 	CRenderTools m_RenderTools;
 
+	bool m_BuildingBlock;
+
 	void OnReset();
 
 	// hooks
@@ -340,6 +342,7 @@ public:
 	class CItems *m_pItems;
 	class CMapLayers *m_pMapLayersBackGround;
 	class CMapLayers *m_pMapLayersForeGround;
+	class CBlock *m_pBlocks;
 };
 
 

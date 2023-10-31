@@ -201,6 +201,9 @@ public:
 
 	// MineTee
 	int SendTileModif(int ClientID, ivec2 Pos, int Group, int Layer, int Index, int Flags, int Reserved);
+
+	// Ninslash
+	void OnBlockChange(vec2 Pos);
 };
 
 inline int64 CmaskAll() { return -1; }

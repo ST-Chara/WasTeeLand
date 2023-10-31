@@ -18,6 +18,7 @@ CCollision::CCollision()
 	m_Width = 0;
 	m_Height = 0;
 	m_pLayers = 0;
+	m_pBlocks = 0;
 }
 
 void CCollision::Init(class CLayers *pLayers)
@@ -26,6 +27,10 @@ void CCollision::Init(class CLayers *pLayers)
 	m_Width = m_pLayers->GameLayer()->m_Width;
 	m_Height = m_pLayers->GameLayer()->m_Height;
 	m_pTiles = static_cast<CTile *>(m_pLayers->Map()->GetData(m_pLayers->GameLayer()->m_Data));
+
+	m_pBlocks = new bool[m_Width * m_Height];
+	for (int i = 0; i < m_Width * m_Height; i++)
+		m_pBlocks[i] = false;
 
 	for(int i = 0; i < m_Width*m_Height; i++)
 	{
@@ -55,6 +60,9 @@ int CCollision::GetTile(int x, int y) const
 {
 	int Nx = clamp(x/32, 0, m_Width-1);
 	int Ny = clamp(y/32, 0, m_Height-1);
+
+	if (m_pBlocks[Ny * m_Width + Nx] && Nx > 0 && Ny > 0 && Nx < m_Width - 1 && Ny < m_Height - 1)
+		return COLFLAG_SOLID;
 
 	return m_pTiles[Ny*m_Width+Nx].m_Index > 128 ? 0 : m_pTiles[Ny*m_Width+Nx].m_Index;
 }
@@ -319,4 +327,52 @@ bool CCollision::ModifTile(ivec2 pos, int group, int layer, int index, int flags
 	}
 
 	return true;
+}
+
+void CCollision::SetBlock(ivec2 Pos, bool Block)
+{
+	int Nx = clamp(Pos.x / 32, 0, m_Width - 1);
+	int Ny = clamp(Pos.y / 32, 0, m_Height - 1);
+
+	m_pBlocks[Ny * m_Width + Nx] = Block;
+}
+
+bool CCollision::GetBlock(int x, int y)
+{
+	int Nx = clamp(x / 32, 0, m_Width - 1);
+	int Ny = clamp(y / 32, 0, m_Height - 1);
+
+	if (Nx > 0 && Ny > 0 && Nx < m_Width - 1 && Ny < m_Height - 1)
+		return m_pBlocks[Ny * m_Width + Nx];
+
+	return 0;
+}
+
+bool CCollision::CanBuildBlock(int x, int y)
+{
+	int Nx = clamp(x / 32, 0, m_Width - 1);
+	int Ny = clamp(y / 32, 0, m_Height - 1);
+
+	if (Nx > 0 && Ny > 0 && Nx < m_Width - 1 && Ny < m_Height - 1)
+		return true;
+
+	return false;
+}
+
+bool CCollision::IntersectBlocks(vec2 Pos0, vec2 Pos1)
+{
+	float Distance = distance(Pos0, Pos1);
+	int End(Distance + 1);
+
+	for (int i = 0; i < End; i++)
+	{
+		float a = i / Distance;
+		vec2 Pos = mix(Pos0, Pos1, a);
+		if (GetBlock(Pos.x, Pos.y))
+		{
+			return true;
+		}
+	}
+
+	return false;
 }

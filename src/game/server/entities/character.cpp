@@ -11,6 +11,8 @@
 #include "laser.h"
 #include "projectile.h"
 
+#include "block.h"
+
 // input count
 struct CInputCount
 {
@@ -47,6 +49,7 @@ CCharacter::CCharacter(CGameWorld *pWorld)
 	m_Armor = 0;
 	m_Mana = 0;
 	m_TriggeredEvents = 0;
+	m_ForceCoreSend = false;
 }
 
 void CCharacter::Reset()
@@ -376,15 +379,15 @@ void CCharacter::FireWeapon()
 		{
 			GameServer()->CreateSound(GetPos(), SOUND_HOOK_NOATTACH);
 		}
+	}
+	break;
 
-		const float Zoom = 1.35f;
-		ivec2 TilePos = ivec2((m_Pos.x+m_LatestInput.m_TargetX*Zoom)/32.0f, (m_Pos.y+m_LatestInput.m_TargetY*Zoom)/32.0f);
-		if (GameServer()->Collision()->ModifTile(TilePos, GameServer()->Layers()->GetGameGroupIndex(), GameServer()->Layers()->GetGameLayerIndex(), TILE_SOLID, 0, 0))
-		{
-			GameServer()->SendTileModif(-1, TilePos, GameServer()->Layers()->GetGameGroupIndex(), GameServer()->Layers()->GetGameLayerIndex(), TILE_SOLID, 0, 0);
-			GameServer()->SendTileModif(-1, TilePos, GameServer()->Layers()->GetMineTeeGroupIndex(), GameServer()->Layers()->GetMineTeeLayerIndex(), TILE_SOLID, 0, 0);
-			GameServer()->CreateSound(m_Pos, SOUND_NINJA_HIT);
-		}
+	case WEAPON_BLOCK:
+	{
+		vec2 TilePos = vec2((m_Pos.x + m_LatestInput.m_TargetX), (m_Pos.y + m_LatestInput.m_TargetY));
+		if (GameServer()->Collision()->CanBuildBlock(TilePos))
+			new CBlock(GameWorld(), 1, TilePos);
+		GameServer()->CreateSound(m_Pos, SOUND_NINJA_HIT);
 	}
 	break;
 
@@ -421,7 +424,7 @@ void CCharacter::FireWeapon()
 								m_pPlayer->GetCID(), m_ActiveWeapon);
 			Hits++;
 		}
-		if(Hits > 0)
+		if (Hits > 0)
 		{
 			if (m_CurrentMana >= 2)
 			{
@@ -726,8 +729,9 @@ void CCharacter::TickDefered()
 		m_Core.Write(&Current);
 
 		// only allow dead reackoning for a top of 3 seconds
-		if (m_ReckoningTick + Server()->TickSpeed() * 3 < Server()->Tick() || mem_comp(&Predicted, &Current, sizeof(CNetObj_Character)) != 0)
+		if (m_ForceCoreSend || m_ReckoningTick + Server()->TickSpeed() * 3 < Server()->Tick() || mem_comp(&Predicted, &Current, sizeof(CNetObj_Character)) != 0)
 		{
+			m_ForceCoreSend = false;
 			m_ReckoningTick = Server()->Tick();
 			m_SendCore = m_Core;
 			m_ReckoningCore = m_Core;

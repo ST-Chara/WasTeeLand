@@ -23,6 +23,7 @@ public:
 		ENTTYPE_PICKUP,
 		ENTTYPE_CHARACTER,
 		ENTTYPE_FLAG,
+		ENTTYPE_BLOCK,
 		NUM_ENTTYPES
 	};
 
@@ -138,7 +139,7 @@ public:
 			is being created.
 	*/
 	void Snap(int SnappingClient);
-	
+
 	void PostSnap();
 
 	/*

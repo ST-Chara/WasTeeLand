@@ -12,6 +12,7 @@ class CCollision
 	int m_Width;
 	int m_Height;
 	class CLayers *m_pLayers;
+	bool *m_pBlocks;
 
 	bool IsTile(int x, int y, int Flag = COLFLAG_SOLID) const;
 	int GetTile(int x, int y) const;
@@ -38,6 +39,20 @@ public:
 
 	bool ModifTile(ivec2 pos, int group, int layer, int index, int flags, int reserved, bool limited = true, bool regen = true);
 	void RegenerateSkip(CTile *pTiles, int Width, int Height, ivec2 Pos, bool Delete);
+
+	bool GetBlock(int x, int y);
+	void SetBlock(ivec2 Pos, bool Block);
+
+	bool CheckBlocks(float x, float y) { return GetBlock(round_to_int(x), round_to_int(y)); }
+	bool CheckBlocks(vec2 Pos) { return CheckBlocks(Pos.x, Pos.y); }
+
+	int GetWidth() { return m_Width; }
+	int GetHeight() { return m_Height; }
+	int FastIntersectLine(vec2 Pos0, vec2 Pos1);
+	bool IntersectBlocks(vec2 Pos0, vec2 Pos1);
+
+	bool CanBuildBlock(int x, int y);
+	bool CanBuildBlock(vec2 Pos) { return CanBuildBlock(round_to_int(Pos.x), round_to_int(Pos.y)); }
 };
 
 #endif
